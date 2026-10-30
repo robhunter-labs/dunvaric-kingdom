@@ -146,6 +146,52 @@ class Quarantine(Base):
             bellows.promote(self.ws, card, witness="looked fine", by="Rob")
 
 
+class ReviewRegressions(Base):
+    """Regressions for the 2026-10-30 code review."""
+    REAL = "https://example.org/real-advisory"
+
+    def fire(self, url, **kw):
+        f = {"watch_id": "W-1", "score": 2, "title": "t", "url": url, "date": "2026-10-30",
+             "why": "w", "analysis": "a", "recommendation": "r", "reopen": "no"}
+        f.update(kw)
+        return f
+
+    def test_mentioning_a_url_cannot_suppress_its_later_genuine_signal(self):
+        hostile = self.fire("https://attacker.example/x", analysis=f"already covered: {self.REAL}")
+        self.assertEqual(bellows.land(self.ws, [hostile])["cards_written"], 1)
+        out = bellows.land(self.ws, [self.fire(self.REAL)])
+        self.assertEqual(out["cards_written"], 1, out)
+        self.assertEqual(out["deduped"], [])
+
+    def test_short_url_is_not_a_substring_match(self):
+        bellows.land(self.ws, [self.fire(self.REAL)])
+        out = bellows.land(self.ws, [self.fire("h")])
+        self.assertEqual(out["cards_written"], 1, out)
+
+    def test_exact_url_still_dedupes(self):
+        bellows.land(self.ws, [self.fire(self.REAL)])
+        out = bellows.land(self.ws, [self.fire(self.REAL)])
+        self.assertEqual(out["cards_written"], 0)
+        self.assertEqual(len(out["deduped"]), 1)
+
+    def test_agent_names_cannot_promote(self):
+        bellows.land(self.ws, [self.fire(self.REAL)])
+        card = next(self.ws.quarantine.glob("*.md"))
+        for who in ("agent", "Claude Code", "codex-cli", ""):
+            with self.assertRaises(PermissionError):
+                bellows.promote(self.ws, card, "read the source", who)
+
+    def test_promotion_must_raise_the_grade(self):
+        bellows.land(self.ws, [self.fire(self.REAL)])
+        card = next(self.ws.quarantine.glob("*.md"))
+        meta = bellows.promote(self.ws, card, "read the source", "Rob", to="G-B")
+        self.assertEqual(meta["promoted"]["from"], "G-D")
+        with self.assertRaises(PermissionError):
+            bellows.promote(self.ws, card, "again", "Rob", to="G-B")
+        meta = bellows.promote(self.ws, card, "measured it", "Rob", to="G-A")
+        self.assertEqual(meta["promoted"]["from"], "G-B")
+
+
 class Cli(Base):
     def test_cli_round_trip(self):
         rc = bellows.main(["--root", str(self.tmp), "land", "--fires", str(FIX / "fires.json")])
