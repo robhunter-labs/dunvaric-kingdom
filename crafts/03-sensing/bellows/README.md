@@ -4,13 +4,13 @@
 
 Every useful agent reads the outside world: search results, pages, newsletters, papers, other agents' messages. Any of it can carry instructions. Bellows is the Kingdom's answer to one narrow part of that problem. It doesn't try to make outside content trustworthy. It makes sure outside content can never *become authority*.
 
-It works in two moves. First, the question comes before the answer. A **watch** is a standing question written at decision time: which decision it informs, the terms that would make something worth a look, and what a real signal would change. Content that doesn't overlap a live watch is dropped. Second, anything that does land is **quarantined**. It arrives at grade G-D (narrated, untrusted), every outside field sits inside one sanitized fence under a banner that says *data, not instructions*, and the bytes are hashed. The only way out is a promotion: a person decides, and the record shows who and when.
+It works in two moves. First, the question comes before the answer. A **watch** is a standing question written at decision time: which decision it informs, the terms that would make something worth a look, and what a real signal would change. Content that doesn't overlap a live watch is dropped. Second, anything that does land is **quarantined**. It arrives at grade G-D (narrated, untrusted), every outside field sits inside one sanitized fence under a banner that says *data, not instructions*, and the bytes are hashed. The only way out is a promotion: a person decides, and the record shows who and when. The "person" is a self-declared name: Bellows refuses an empty name and obvious agent names, and trusts anything else you type.
 
 Between those two moves sits a judgment: how strongly does this bear on the watch? 3 means it hits the watch's specific object, 2 means the topic but not the object, and 1 or 0 never lands. When unsure, score down. A wrong signal erodes trust faster than a missed one. The code never assigns that score; a term hit only makes something a candidate.
 
 ## Run it
 
-Python 3.9 or newer, standard library only.
+Python 3.9 or newer, standard library only. The commands below use a POSIX shell (macOS, Linux, WSL).
 
 ```bash
 cd crafts/03-sensing/bellows
@@ -19,10 +19,13 @@ python3 bellows.py --root /tmp/bellows-demo candidates --signals fixtures/signal
 python3 bellows.py --root /tmp/bellows-demo land --fires fixtures/fires.json
 python3 bellows.py --root /tmp/bellows-demo land --fires fixtures/hostile_fires.json
 python3 bellows.py --root /tmp/bellows-demo status
+# then try the only door out, as an agent and as a person:
+python3 bellows.py --root /tmp/bellows-demo promote /tmp/bellows-demo/quarantine/<CARD>.md --witness "read the source" --by agent
+python3 bellows.py --root /tmp/bellows-demo promote /tmp/bellows-demo/quarantine/<CARD>.md --witness "read the source" --by "Your Name"
 python3 -m unittest discover -s tests -v
 ```
 
-Open the card in `/tmp/bellows-demo/quarantine/` that came from `hostile_fires.json`. The fixture tries to close the fence early, claim admin mode, run a command, and promote itself. All of it is still inside the fence, inert. The command is a harmless placeholder. And if you can't get a card promoted, read the promotion rule again. That one's on purpose.
+Open the card in `/tmp/bellows-demo/quarantine/` that came from `hostile_fires.json`. The fixture tries to close the fence early, claim admin mode, run a command, and promote itself. All of it is still inside the fence, inert. The command is a harmless placeholder. Dedup is on the exact source URL recorded in the intake ledger, never on card text, so a hostile card that merely *mentions* a URL can't hide a later, genuine signal from that URL.
 
 ## Files
 
