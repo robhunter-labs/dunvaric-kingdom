@@ -1,0 +1,25 @@
+{
+  "watches": [
+    {
+      "id": "W-1",
+      "informs": "Whether my agents may summarize arbitrary web pages without a person reading the page first.",
+      "query_terms": ["prompt injection", "indirect prompt injection", "browser agent", "untrusted content"],
+      "would_change": "The default for web-reading agents: keep the quarantine step, add a layer, or relax it.",
+      "status": "live"
+    },
+    {
+      "id": "W-2",
+      "informs": "Which local model runtime the bench uses next.",
+      "query_terms": ["llama.cpp", "MLX", "quantization"],
+      "would_change": "The bench's runtime pin and its setup notes.",
+      "status": "live"
+    },
+    {
+      "id": "W-3",
+      "informs": "A decision already made and closed.",
+      "query_terms": ["agent"],
+      "would_change": "Nothing. Closed watches are never scanned.",
+      "status": "closed"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "fires": [
+    {"watch_id": "W-1", "score": 2, "url": "https://example.org/research/indirect-injection", "date": "2026-10-20",
+     "title": "New study on indirect prompt injection in browser agents",
+     "why": "Names the summarize-a-page chain W-1 exists to watch.",
+     "analysis": "A summarize request escalated through ordinary tool choices into code execution. Each step was plausible; the composition crossed a boundary nobody re-authorized.",
+     "recommendation": "Watch, no change yet: keep the quarantine step.", "reopen": "no"}
+  ]
+}

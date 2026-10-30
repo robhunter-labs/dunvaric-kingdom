@@ -1,0 +1,8 @@
+{
+  "signals": [
+    {"title": "New study on indirect prompt injection in browser agents", "summary": "Researchers chain a summarize request into code execution.", "url": "https://example.org/research/indirect-injection", "date": "2026-10-20"},
+    {"title": "MLX adds faster 4-bit quantization", "summary": "Release notes.", "url": "https://example.org/mlx-release", "date": "2026-10-21"},
+    {"title": "A reagent shortage hits labs", "summary": "Chemistry supply news; nothing about software.", "url": "https://example.org/reagents", "date": "2026-10-22"},
+    {"title": "Gardening tips for autumn", "summary": "Unrelated.", "url": "https://example.org/garden", "date": "2026-10-22"}
+  ]
+}
