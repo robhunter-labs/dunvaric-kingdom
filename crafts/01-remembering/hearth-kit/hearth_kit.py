@@ -5,7 +5,7 @@ This is a teaching rewrite, not the Kingdom's own Hearth. It keeps the shape and
 
   kindle   read the frame first: the capsule's four shared fields, then a freshness verdict
   capture  one typed note the moment a decision happens (cheap, or it won't happen)
-  fold     apply pending notes to the capsule, in order, under a lock
+  fold     apply pending notes to the capsule, in capture order, under a lock
   bank     a person closes the milestone: everything folded, board current, capsule true and small
 
 Plus two helpers the essay leans on: session claims (claim before you write, refuse to close
@@ -15,11 +15,19 @@ filesystem it is standing on.
 Layout under --root (default "."):  capsule/CAPSULE.json   the capsule (must already exist)
                                      capsule/pending/       captured, not yet folded
                                      capsule/applied/       folded notes, kept, never deleted
+                                     capsule/withdrawn/     notes a person withdrew, kept
                                      capsule/DECISIONS.jsonl, capsule/sessions/, BOARD.md
-Standard library only.
+Timestamps are UTC, written as YYYYMMDDTHHMMSSZ (e.g. 20261031T140000Z). BOARD.md's
+`last_updated:` line may use that form or ISO 8601 (2026-10-31T14:00:00Z).
+
+"Named person" checks (bank, release, withdraw) are a speed bump, not identity: they refuse an
+empty name and obvious agent names, but they trust whatever name you type.
+Standard library only; Python 3.9+.
 """
 import argparse
+import datetime
 import hashlib
+import re
 import json
 import os
 import pathlib
@@ -33,7 +41,35 @@ KINDS = ("decision", "open", "resolve", "next")
 CAPSULE_FIELDS = ("thesis", "the_governing_gate", "open_items", "next")
 CAPSULE_CAP_BYTES = 16 * 1024
 STALE_LOCK_SECONDS = 600
-NOT_A_PERSON = {"agent", "assistant", "bot", "model", "claude", "chatgpt", "codex", "auto"}
+NOT_A_PERSON = {"agent", "assistant", "bot", "model", "claude", "chatgpt", "gpt", "codex",
+                "copilot", "gemini", "auto", "cli", "llm", "ai"}
+_last_seq = 0
+
+
+def is_person(name):
+    """A speed bump, not identity: refuse empty names and names containing an obvious agent word
+    ('Claude Code', 'codex-cli'). Whatever else is typed is trusted as self-declared."""
+    words = set(re.split(r"[^a-z0-9]+", str(name).strip().lower())) - {""}
+    return bool(words) and not (words & NOT_A_PERSON)
+
+
+def parse_ts(value):
+    """Accept YYYYMMDDTHHMMSSZ or ISO 8601 (with or without -/:). Returns None if unreadable."""
+    v = str(value).strip().replace("-", "").replace(":", "")
+    v = v.split(".")[0].removesuffix("+0000").removesuffix("Z")
+    for fmt in ("%Y%m%dT%H%M%S", "%Y%m%d"):
+        try:
+            return datetime.datetime.strptime(v, fmt)
+        except ValueError:
+            continue
+    return None
+
+
+def next_seq():
+    """Monotonic capture sequence, so notes captured in the same second still fold in order."""
+    global _last_seq
+    _last_seq = max(time.time_ns(), _last_seq + 1)
+    return _last_seq
 
 
 class Refused(Exception):
@@ -58,11 +94,11 @@ class Hearth:
         self.lock, self.board = self.dir / ".fold.lock", self.root / "BOARD.md"
 
     def capsule(self):
-        return json.loads(self.capsule_path.read_text())
+        return json.loads(self.capsule_path.read_text(encoding="utf-8"))
 
     def write_capsule(self, cap):
         tmp = self.capsule_path.with_suffix(".tmp")
-        tmp.write_text(json.dumps(cap, indent=2) + "\n")
+        tmp.write_text(json.dumps(cap, indent=2) + "\n", encoding="utf-8")
         os.replace(tmp, self.capsule_path)
 
     # ---- kindle -----------------------------------------------------------------------------
@@ -92,8 +128,9 @@ class Hearth:
             if v:
                 atom[k] = v
         self.pending.mkdir(exist_ok=True)
-        path = self.pending / f"{atom['ts']}-{atom['id']}.json"
-        path.write_text(json.dumps(atom, sort_keys=True) + "\n")
+        # The filename carries a nanosecond sequence so sorted order == capture order.
+        path = self.pending / f"{next_seq():020d}-{atom['id']}.json"
+        path.write_text(json.dumps(atom, sort_keys=True) + "\n", encoding="utf-8")
         return path
 
     # ---- fold -------------------------------------------------------------------------------
@@ -115,9 +152,9 @@ class Hearth:
         if kind == "decision":
             seen = set()
             if self.ledger.exists():
-                seen = {json.loads(l)["id"] for l in self.ledger.read_text().splitlines() if l}
+                seen = {json.loads(l)["id"] for l in self.ledger.read_text(encoding="utf-8").splitlines() if l}
             if atom["id"] not in seen:
-                with self.ledger.open("a") as fh:
+                with self.ledger.open("a", encoding="utf-8") as fh:
                     fh.write(json.dumps(atom, sort_keys=True) + "\n")
             return True
         if kind == "open":
@@ -125,7 +162,8 @@ class Hearth:
             return True
         if kind == "resolve":
             before = list(cap.get("open_items", []))
-            cap["open_items"] = [i for i in before if atom["target"] not in i]
+            # Exact match only: '--target chapter' must not clear every item containing 'chapter'.
+            cap["open_items"] = [i for i in before if i != atom["target"]]
             return len(cap["open_items"]) < len(before)   # matched nothing -> retained, loudly
         if kind == "next":
             cap["next"] = atom["text"]
@@ -137,7 +175,11 @@ class Hearth:
         try:
             cap, applied, retained = self.capsule(), [], []
             for path in sorted(self.pending.glob("*.json")) if self.pending.is_dir() else []:
-                atom = json.loads(path.read_text())
+                try:
+                    atom = json.loads(path.read_text(encoding="utf-8"))
+                except ValueError:
+                    raise Refused(f"{path.name} is not valid JSON; fix it, or withdraw it with "
+                                  "`withdraw NOTE --by NAME --reason WHY`. Nothing was folded.")
                 (applied if self._apply(cap, atom) else retained).append((path, atom))
             if applied:
                 cap["last_folded_atom"] = max(a["ts"] for _, a in applied)
@@ -154,7 +196,7 @@ class Hearth:
         """BOARD.md lines like '- [done] item' or '- [open] item', plus 'last_updated: <ts>'."""
         items, updated = {}, ""
         if self.board.exists():
-            for line in self.board.read_text().splitlines():
+            for line in self.board.read_text(encoding="utf-8").splitlines():
                 line = line.strip()
                 if line.startswith("last_updated:"):
                     updated = line.split(":", 1)[1].strip()
@@ -177,23 +219,47 @@ class Hearth:
 
     # ---- bank: a person closes the milestone -------------------------------------------------
     def bank(self, by, note=""):
-        if not by.strip() or by.strip().lower() in NOT_A_PERSON:
+        if not is_person(by):
             raise Refused("bank is a person's act. The maker doesn't get to be the judge.")
-        if self.pending.is_dir() and any(self.pending.glob("*.json")):
-            raise Refused("unfolded notes are waiting; run fold first")
+        waiting = sorted(p.name for p in self.pending.glob("*.json")) if self.pending.is_dir() else []
+        if waiting:
+            raise Refused(f"unfolded notes are waiting: {waiting}. Run fold; a note that never "
+                          "applies (e.g. a resolve that matches nothing) can be withdrawn with "
+                          "`withdraw NOTE --by NAME --reason WHY`")
         cap, (_, board_updated) = self.capsule(), self.board_items()
         newest = cap.get("last_folded_atom", "")
-        if newest and (not board_updated or board_updated < newest):
-            raise Refused(f"the board was last updated {board_updated or 'never'}, before the newest "
-                          f"folded note ({newest}); refresh the board in this bank")
+        if newest:
+            board_ts, newest_ts = parse_ts(board_updated), parse_ts(newest)
+            if board_updated and board_ts is None:
+                raise Refused(f"BOARD.md last_updated {board_updated!r} isn't a timestamp; use "
+                              "YYYYMMDDTHHMMSSZ (e.g. 20261031T140000Z) or ISO 8601")
+            if not board_updated or (newest_ts and board_ts < newest_ts):
+                raise Refused(f"the board was last updated {board_updated or 'never'}, before the newest "
+                              f"folded note ({newest}); refresh the board's last_updated line "
+                              "(format YYYYMMDDTHHMMSSZ, e.g. 20261031T140000Z) in this bank")
         findings = self.fresh()
         if findings:
             raise Refused("the capsule doesn't tell the truth yet: " + "; ".join(findings))
-        cap["freshness"] = {"last_banked": utc_now(), "banked_by": by.strip(), "note": note}
+        cap["freshness"] = {"last_banked": utc_now(), "banked_by": by.strip(), "note": note,
+                            "banked_by_is": "self-declared"}
         if len(json.dumps(cap, indent=2).encode()) > CAPSULE_CAP_BYTES:
             raise Refused(f"capsule would exceed {CAPSULE_CAP_BYTES} bytes; compact it first")
         self.write_capsule(cap)
         return cap["freshness"]
+
+    # ---- withdraw: a person takes back a note that should never apply ------------------------
+    def withdraw(self, note, by, reason):
+        if not is_person(by) or not reason.strip():
+            raise Refused("withdrawing a note takes a named person and a reason")
+        path = self.pending / pathlib.Path(note).name
+        if not path.is_file():
+            raise Refused(f"no pending note {path.name}")
+        out = self.dir / "withdrawn"
+        out.mkdir(exist_ok=True)
+        os.replace(path, out / path.name)   # kept, never deleted
+        (out / (path.name + ".why.json")).write_text(json.dumps(
+            {"by": by.strip(), "reason": reason, "at": utc_now()}, indent=2) + "\n", encoding="utf-8")
+        return out / path.name
 
     # ---- session claims ---------------------------------------------------------------------
     def _open_claims(self):
@@ -201,14 +267,14 @@ class Hearth:
             return {}
         out = {}
         for p in self.sessions.glob("*.json"):
-            c = json.loads(p.read_text())
+            c = json.loads(p.read_text(encoding="utf-8"))
             if c["state"] == "open":
                 out[c["sid"]] = c
         return out
 
     def _save_claim(self, c):
         self.sessions.mkdir(exist_ok=True)
-        (self.sessions / f"{c['sid']}.json").write_text(json.dumps(c, indent=2) + "\n")
+        (self.sessions / f"{c['sid']}.json").write_text(json.dumps(c, indent=2) + "\n", encoding="utf-8")
 
     def claim(self, sid, paths):
         for other in self._open_claims().values():
@@ -222,6 +288,9 @@ class Hearth:
         if not c or rel not in c["paths"]:
             raise Refused(f"{rel} isn't claimed by session {sid}; claim before you write")
         target = self.root / rel
+        root = self.root.resolve()
+        if root != target.resolve() and root not in target.resolve().parents:
+            raise Refused(f"{rel} is outside the root; claims cover files under --root only")
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(data)
         c["expected"][rel] = fingerprint(target)
@@ -238,7 +307,7 @@ class Hearth:
         self._save_claim(c)
 
     def release(self, sid, by, reason):
-        if not by.strip() or by.strip().lower() in NOT_A_PERSON or not reason.strip():
+        if not is_person(by) or not reason.strip():
             raise Refused("releasing a stuck claim takes a named person and a reason")
         c = self._open_claims().get(sid)
         if not c:
@@ -296,6 +365,10 @@ def main(argv=None):
     b = sub.add_parser("bank")
     b.add_argument("--by", required=True)
     b.add_argument("--note", default="")
+    w = sub.add_parser("withdraw", help="move a pending note to capsule/withdrawn/ (kept, never deleted)")
+    w.add_argument("note")
+    w.add_argument("--by", required=True)
+    w.add_argument("--reason", required=True)
     args = ap.parse_args(argv)
     try:
         h = Hearth(args.root)
@@ -312,6 +385,8 @@ def main(argv=None):
             return 1 if found else 0
         elif args.cmd == "bank":
             print(json.dumps(h.bank(args.by, args.note)))
+        elif args.cmd == "withdraw":
+            print(h.withdraw(args.note, args.by, args.reason).name)
     except Refused as why:
         if args.cmd == "kindle" and "no capsule at" in str(why):
             # Say it out loud: a session that can't reach its memory must not look like one that can.
