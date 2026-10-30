@@ -22,6 +22,6 @@ The story behind the Kingdom, and the map, start at [*Welcome to the Kingdom*](h
 
 ## What's here, and what isn't
 
-Everything on this shelf is a small, standalone rewrite of a working piece, with its own tests, using only Python's standard library. None of it is the private system itself, and none of it reaches a network, an account or a real target. Each piece says plainly what has been tested and what hasn't.
+Everything on this shelf is a small, standalone rewrite of a working piece, with its own tests, using only Python's standard library (Python 3.9 or newer). None of it is the private system itself, and none of it reaches a network, an account or a real target. Each piece says plainly what has been tested and what hasn't.
 
 Copyright © 2026 Rob Hunter. Original code is released under the MIT license in `LICENSE`.
