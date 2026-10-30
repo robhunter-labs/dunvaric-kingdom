@@ -162,6 +162,74 @@ class Bank(Base):
             self.h.bank("Rob")
 
 
+class ReviewRegressions(Base):
+    """Regressions for the 2026-10-30 code review."""
+
+    def test_same_second_captures_fold_in_capture_order(self):
+        for _ in range(50):
+            self.h.capture("next", "A")
+            self.h.capture("next", "B")
+            self.h.fold()
+            self.assertEqual(self.h.capsule()["next"], "B")
+
+    def test_resolve_matches_exactly(self):
+        self.h.capture("open", "chapter one")
+        self.h.capture("open", "chapter two")
+        self.h.capture("resolve", "done", target="chapter")
+        self.h.fold()
+        self.assertEqual([i for i in self.h.capsule()["open_items"] if i.startswith("chapter")],
+                         ["chapter one", "chapter two"])
+
+    def test_agent_name_variants_cannot_bank(self):
+        self.h.capture("next", "Outline the second chapter")
+        self.h.fold()
+        self.set_board([("Draft the first chapter", "open"), ("Outline the second chapter", "open")],
+                       hk.utc_now())
+        for who in ("Claude Code", "codex-cli", "GPT-5", "my assistant"):
+            with self.assertRaises(hk.Refused):
+                self.h.bank(who)
+
+    def test_iso_board_timestamp_is_accepted(self):
+        self.h.capture("next", "Outline the second chapter")
+        self.h.fold()
+        self.set_board([("Draft the first chapter", "open"), ("Outline the second chapter", "open")],
+                       "2999-01-01T00:00:00Z")
+        self.assertEqual(self.h.bank("Rob")["banked_by"], "Rob")
+
+    def test_unreadable_board_timestamp_names_the_format(self):
+        self.h.capture("next", "Outline the second chapter")
+        self.h.fold()
+        self.set_board([("Outline the second chapter", "open")], "last tuesday")
+        with self.assertRaisesRegex(hk.Refused, "YYYYMMDDTHHMMSSZ"):
+            self.h.bank("Rob")
+
+    def test_stuck_note_can_be_withdrawn_and_is_kept(self):
+        self.h.capture("next", "Outline the second chapter")
+        stuck = self.h.capture("resolve", "x", target="no such item")
+        self.h.fold()
+        self.set_board([("Draft the first chapter", "open"), ("Outline the second chapter", "open")],
+                       hk.utc_now())
+        with self.assertRaisesRegex(hk.Refused, stuck.name):
+            self.h.bank("Rob")
+        with self.assertRaises(hk.Refused):
+            self.h.withdraw(stuck.name, "agent", "no")
+        self.h.withdraw(stuck.name, "Rob", "target was a typo")
+        self.assertTrue((self.h.dir / "withdrawn" / stuck.name).is_file())
+        self.assertEqual(self.h.bank("Rob")["banked_by"], "Rob")
+
+    def test_malformed_note_is_refused_by_name(self):
+        self.h.pending.mkdir(exist_ok=True)
+        (self.h.pending / "broken.json").write_text("{not json")
+        with self.assertRaisesRegex(hk.Refused, "broken.json"):
+            self.h.fold()
+        self.assertFalse(self.h.lock.exists())
+
+    def test_write_outside_root_refused(self):
+        self.h.claim("s1", ["../escape.txt"])
+        with self.assertRaises(hk.Refused):
+            self.h.write("s1", "../escape.txt", b"x")
+
+
 class Sessions(Base):
     def test_c2_unclaimed_write_refused(self):
         with self.assertRaises(hk.Refused):
