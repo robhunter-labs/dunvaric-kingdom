@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 720" role="img" aria-labelledby="bw-t bw-d">
+<title id="bw-t">Bellows: how outside content reaches a decision</title>
+<desc id="bw-d">Five stations left to right. Standing questions are written first, at decision time. Outside content arrives from feeds and search. A deterministic pre-filter keeps only content whose terms overlap a live watch; the rest is dropped. A judgment step scores binding strength from 0 to 3; only 2 or 3 lands. Landed content goes into quarantine at grade G-D, fenced inert with a hash sidecar. Only a person with a named witness can promote it, and the promotion is written to a ledger. Content can inform a decision; it can never become an instruction.</desc>
+<defs><filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 .07"/></feComponentTransfer></filter><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#f1b84b"/></marker><marker id="q" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#7f9eff"/></marker></defs>
+<rect width="1600" height="720" fill="#080808"/>
+<text x="64" y="66" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="13" letter-spacing="5" fill="#f1b84b">PLATE · THE GATE CALLED BELLOWS</text>
+<text x="62" y="114" font-family="Georgia,'Times New Roman',serif" font-size="40" fill="#eee9df">Content may inform. It may never instruct.</text>
+<text x="64" y="148" font-family="Georgia,'Times New Roman',serif" font-style="italic" font-size="21" fill="#8c8479">The question is written before the answer arrives.</text>
+<rect x="330" y="186" width="560" height="64" fill="none" stroke="#f1b84b" stroke-opacity=".6" stroke-dasharray="3 4"/>
+<text x="350" y="212" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" letter-spacing="4" fill="#f1b84b">STANDING QUESTIONS · WRITTEN FIRST</text>
+<text x="350" y="236" font-family="Arial,Helvetica,sans-serif" font-size="14" fill="#eee9df" fill-opacity=".85">the decision it informs · the terms worth a look · what a real signal would change</text>
+<rect x="32" y="318" width="236" height="124" fill="#11100e" stroke="#7f9eff" stroke-opacity=".85"/>
+<path d="M32 318 h14 M32 318 v14 M268 442 h-14 M268 442 v-14" stroke="#7f9eff" stroke-width="2"/>
+<text x="52" y="350" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" letter-spacing="3" fill="#8c8479">01</text>
+<text x="52" y="386" font-family="Georgia,'Times New Roman',serif" font-size="26" fill="#eee9df">Outside</text>
+<text x="52" y="412" font-family="Arial,Helvetica,sans-serif" font-size="13.5" fill="#8c8479">feeds · search · posts</text>
+<path d="M272 380 H324" stroke="#7f9eff" stroke-width="1.6" marker-end="url(#q)"/>
+<rect x="332" y="318" width="236" height="124" fill="#11100e" stroke="#eee9df" stroke-opacity=".85"/>
+<path d="M332 318 h14 M332 318 v14 M568 442 h-14 M568 442 v-14" stroke="#eee9df" stroke-width="2"/>
+<text x="352" y="350" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" letter-spacing="3" fill="#8c8479">02</text>
+<text x="352" y="386" font-family="Georgia,'Times New Roman',serif" font-size="26" fill="#eee9df">Pre-filter</text>
+<text x="352" y="412" font-family="Arial,Helvetica,sans-serif" font-size="13.5" fill="#8c8479">whole-phrase term overlap</text>
+<path d="M572 380 H644" stroke="#f1b84b" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M450 446 V508" stroke="#8c8479" stroke-opacity=".7" stroke-dasharray="2 4"/>
+<text x="450" y="530" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" letter-spacing="2" fill="#8c8479">NO OVERLAP: DROPPED</text>
+<rect x="652" y="318" width="236" height="124" fill="#11100e" stroke="#eee9df" stroke-opacity=".85"/>
+<path d="M652 318 h14 M652 318 v14 M888 442 h-14 M888 442 v-14" stroke="#eee9df" stroke-width="2"/>
+<text x="672" y="350" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" letter-spacing="3" fill="#8c8479">03</text>
+<text x="672" y="386" font-family="Georgia,'Times New Roman',serif" font-size="26" fill="#eee9df">Judgment</text>
+<text x="672" y="412" font-family="Arial,Helvetica,sans-serif" font-size="13.5" fill="#8c8479">binding strength 0 to 3</text>
+<path d="M892 380 H964" stroke="#f1b84b" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M770 446 V508" stroke="#8c8479" stroke-opacity=".7" stroke-dasharray="2 4"/>
+<text x="770" y="530" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" letter-spacing="2" fill="#8c8479">1 OR 0: NEVER LANDS</text>
+<rect x="972" y="318" width="236" height="124" fill="#11100e" stroke="#ff7659" stroke-opacity=".85"/>
+<path d="M972 318 h14 M972 318 v14 M1208 442 h-14 M1208 442 v-14" stroke="#ff7659" stroke-width="2"/>
+<text x="992" y="350" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" letter-spacing="3" fill="#8c8479">04</text>
+<text x="992" y="386" font-family="Georgia,'Times New Roman',serif" font-size="26" fill="#eee9df">Quarantine</text>
+<text x="992" y="412" font-family="Arial,Helvetica,sans-serif" font-size="13.5" fill="#8c8479">G-D · fenced · hashed</text>
+<path d="M1212 380 H1284" stroke="#f1b84b" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1090 446 V508" stroke="#8c8479" stroke-opacity=".7" stroke-dasharray="2 4"/>
+<text x="1090" y="530" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" letter-spacing="2" fill="#8c8479">NO WITNESS: STAYS G-D</text>
+<rect x="1292" y="318" width="236" height="124" fill="#11100e" stroke="#f1b84b" stroke-opacity=".85"/>
+<path d="M1292 318 h14 M1292 318 v14 M1528 442 h-14 M1528 442 v-14" stroke="#f1b84b" stroke-width="2"/>
+<text x="1312" y="350" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" letter-spacing="3" fill="#8c8479">05</text>
+<text x="1312" y="386" font-family="Georgia,'Times New Roman',serif" font-size="26" fill="#eee9df">A person</text>
+<text x="1312" y="412" font-family="Arial,Helvetica,sans-serif" font-size="13.5" fill="#8c8479">named witness · ledger</text>
+<path d="M450 254 V314" stroke="#f1b84b" stroke-opacity=".7" stroke-dasharray="3 4" marker-end="url(#a)"/>
+<path d="M770 254 V314" stroke="#f1b84b" stroke-opacity=".7" stroke-dasharray="3 4" marker-end="url(#a)"/>
+<path d="M1090 314 C1090 240 1300 230 1380 200" fill="none" stroke="#d14628" stroke-width="1.4" stroke-dasharray="5 5"/>
+<path d="M1372 186 l18 18 M1390 186 l-18 18" stroke="#ff7659" stroke-width="2"/>
+<text x="1404" y="200" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" letter-spacing="3" fill="#ff7659">NO PATH</text>
+<text x="1404" y="218" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#8c8479">to a tool, a prompt,</text>
+<text x="1404" y="235" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#8c8479">or an action</text>
+<path d="M332 570 H568" stroke="#eee9df" stroke-opacity=".35"/><text x="332" y="592" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" letter-spacing="3" fill="#8c8479">CODE · DETERMINISTIC</text>
+<path d="M652 570 H888" stroke="#eee9df" stroke-opacity=".35"/><text x="652" y="592" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" letter-spacing="3" fill="#8c8479">JUDGMENT · REVIEWABLE</text>
+<path d="M972 570 H1528" stroke="#eee9df" stroke-opacity=".35"/><text x="972" y="592" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" letter-spacing="3" fill="#8c8479">CODE · FAIL-CLOSED</text>
+<path d="M64 662 H1536" stroke="#eee9df" stroke-opacity=".18"/>
+<text x="64" y="690" font-family="Georgia,'Times New Roman',serif" font-style="italic" font-size="15" fill="#8c8479">Tested hard at the mechanism level. Not yet attacked end to end.</text>
+<rect width="1600" height="720" filter="url(#grain)" opacity=".9" pointer-events="none"/>
+</svg>
