@@ -13,7 +13,7 @@ Every shelf uses the same three labels: **Observed** (it happened, and the recor
 | 03 | [Sensing](crafts/03-sensing/) | standing questions matched against outside content | **[Bellows](crafts/03-sensing/bellows/)** · Built, not exercised |
 | 04 | [Designing](crafts/04-designing/) | questioning the premise before building | Planned |
 | 05 | [Building](crafts/05-building/) | builds that may stop, return or split | Planned |
-| 06 | [Testing](crafts/06-testing/) | the bar written first, checked by someone else | Planned |
+| 06 | [Testing](crafts/06-testing/) | the bar written first, checked by someone else | **[Chain-test guide](crafts/06-testing/chain-test/)** · Planned (test in progress) |
 | 07 | [Shipping safely](crafts/07-shipping-safely/) | exact releases, and proof of what actually arrived | Planned |
 | 08 | [Defending](crafts/08-defending/) | outside content as data, never instruction | Planned (Bellows covers part) |
 | 09 | [Speaking](crafts/09-speaking/) | private work turned into honest public writing | Planned |
