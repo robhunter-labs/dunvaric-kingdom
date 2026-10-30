@@ -2,7 +2,7 @@
 
 **Status: Planned.** This is the written plan the Kingdom is using for its own chain test. The test is in progress, and no results are claimed here. Results, when they exist, will be published with what held and what didn't.
 
-Companion to *The Most Dangerous Permission Is Read* on [robhunterworks.com](https://robhunterworks.com/writing/).
+Companion to *Guarding the Gates* on [robhunterworks.com](https://robhunterworks.com/writing/).
 
 ## Why a chain
 
