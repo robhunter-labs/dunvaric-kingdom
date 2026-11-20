@@ -35,7 +35,7 @@ Open the card in `/tmp/bellows-demo/quarantine/` that came from `hostile_fires.j
 
 ## What's proven, and what isn't
 
-**Status: Built, not exercised.** The Kingdom's own version has been proven piece by piece, not yet attacked as a chain: the matcher and the quarantine-with-a-twin checks are part of its proof suite, and the intake was refit and proved across several houses. This public rewrite carries the same checks in small form.
+**Status: Checked on the included synthetic fixtures.** The Kingdom's own version has been proven piece by piece, not yet attacked as a chain: the matcher and the quarantine-with-a-twin checks are part of its proof suite, and the intake was refit and proved across several houses. This public rewrite carries the same checks in small form.
 
 It has **not** been attacked end to end. Chains where ordinary tool choices compose into a boundary crossing (a redirect to an archive to a decoder to a second stage), module shadowing, detached child processes, and an outside attacker who adapts are all untested here. Bellows also only guards the content it handles. An agent that browses on its own, outside Bellows, is outside this protection. That gap is the subject of its essay, on the Kingdom tour.
 

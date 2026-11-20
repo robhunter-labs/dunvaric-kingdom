@@ -1,6 +1,6 @@
 # Chain test: a guide for testing an agent that reads
 
-**Status: Planned.** This is the written plan the Kingdom is using for its own chain test. The test is in progress, and no results are claimed here. Results, when they exist, will be published with what held and what didn't.
+**Status: Documented plan.** This is the written plan the Kingdom is using for its own chain test. The test is in progress, and no results are claimed here. Results, when they exist, will be published with what held and what didn't.
 
 Companion to *Guarding the Gates* on [robhunterworks.com](https://robhunterworks.com/writing/).
 
